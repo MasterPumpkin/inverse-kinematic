@@ -2,28 +2,47 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 
-# Define the lengths of the robot arm links in meters
-L1 = 0.5
-L2 = 0.5
-L3 = 0.5
+def inverse_kinematics(x, y, z, L1, L2):
+    theta1 = np.arctan2(y, x)
+    theta2 = np.arccos((L1**2 + L2**2 - x**2 - y**2)/(2*L1*L2))
+    theta3 = np.arctan2(np.sqrt(1 - ((L1**2 + L2**2 - x**2 - y**2)/(2*L1*L2))**2), ((L1 + L2*np.cos(theta2))*z - L2*np.sin(theta2)*np.sqrt(x**2 + y**2))/(L1**2 + 2*L1*L2*np.cos(theta2) + L2**2))
+    return [theta1, theta2, theta3]
+  
+def main():
+    st.title("3 DOF Robotic Arm Inverse Kinematics")
 
-# Define the joint angles in radians
-theta1 = st.slider("Joint 1 angle (in degrees)", -180, 180, 0, 1) * np.pi / 180
-theta2 = st.slider("Joint 2 angle (in degrees)", -180, 180, 0, 1) * np.pi / 180
-theta3 = st.slider("Joint 3 angle (in degrees)", -180, 180, 0, 1) * np.pi / 180
+    # Set the default values for the end-effector position and arm lengths
+    x = st.sidebar.slider("X", -10, 10, 5)
+    y = st.sidebar.slider("Y", -10, 10, 5)
+    z = st.sidebar.slider("Z", -10, 10, 5)
+    L1 = st.sidebar.slider("L1", 1, 10, 5)
+    L2 = st.sidebar.slider("L2", 1, 10, 5)
 
-# Calculate the forward kinematics to find the end effector position
-x = L1*np.cos(theta1) + L2*np.cos(theta1+theta2) + L3*np.cos(theta1+theta2+theta3)
-y = L1*np.sin(theta1) + L2*np.sin(theta1+theta2) + L3*np.sin(theta1+theta2+theta3)
+    # Calculate the joint angles using inverse kinematics
+    angles = inverse_kinematics(x, y, z, L1, L2)
 
-# Define the points to plot the robot arm
-x_points = [0, L1*np.cos(theta1), L1*np.cos(theta1) + L2*np.cos(theta1+theta2), x]
-y_points = [0, L1*np.sin(theta1), L1*np.sin(theta1) + L2*np.sin(theta1+theta2), y]
+    # Plot the arm configuration
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection="3d")
 
-# Create a plot to display the robot arm
-fig, ax = plt.subplots()
-ax.plot(x_points, y_points, 'o-')
-ax.set_xlim(-1.5, 1.5)
-ax.set_ylim(-1.5, 1.5)
-ax.set_aspect('equal')
-st.pyplot(fig)
+	  # Define the arm segments
+	  arm_segments = np.array([[0, 0, 0], [L1*np.cos(angles[0]), L1*np.sin(angles[0]), 0], [L1*np.cos(angles[0]) + L2*np.cos(angles[1] + angles[0]), L1*np.sin(angles[0]) + L2*np.sin(angles[1] + angles[0]), L2*np.sin(angles[2])]])
+
+  	# Plot the arm segments
+	  ax.plot(arm_segments[:, 0], arm_segments[:, 1], arm_segments[:, 2], color="blue")
+
+  	# Set the limits of the plot
+  	ax.set_xlim([-20, 20])
+  	ax.set_ylim([-20, 20])
+  	ax.set_zlim([0, 20])
+
+  	# Set the labels for the axes
+  	ax.set_xlabel("X")
+  	ax.set_ylabel("Y")
+  	ax.set_zlabel("Z")
+
+  	# Show the plot
+  	st.write(fig)
+
+if __name__ == "__main__": 
+	main()
