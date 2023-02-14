@@ -57,7 +57,7 @@ def main():
 
     if st.button("Visualize"):
         plot_robot(theta1, theta2, theta3)
-	st.balloons()
+        st.balloons()
 
 if __name__ == "__main__": 
 	main()
