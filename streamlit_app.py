@@ -57,24 +57,22 @@ ax.plot(desired_data[:,0], desired_data[:,1], desired_data[:,2], 'ro', markersiz
 # Create the animation
 
 for i in range(frames): 
-	theta1 = theta1_vals[i] 
-	theta2 = theta2_vals[i] 
-	theta3 = theta3_vals[i]
-	arm_data = np.array([[0, 0, 0], [L1*np.cos(theta1), L1*np.sin(theta1), 0], [L1*np.cos(theta1) + L2*np.cos(theta1+theta2), L1*np.sin(theta1) + L2*np.sin(theta1+theta2), 0], [L1*np.cos(theta1) + L2*np.cos(theta1+theta2) + L3*np.cos(theta1+theta2+theta3), L1*np.sin(theta1) + L2*np.sin(theta1+theta2) + L3*np.sin(theta1+theta2+theta3), 0]])
-	desired_data = np.array([[x_desired, y_desired, 0]])
+    theta1 = theta1_vals[i] 
+    theta2 = theta2_vals[i] 
+    theta3 = theta3_vals[i]
+    arm_data = np.array([[0, 0, 0], [L1*np.cos(theta1), L1*np.sin(theta1), 0], [L1*np.cos(theta1) + L2*np.cos(theta1+theta2), L1*np.sin(theta1) + L2*np.sin(theta1+theta2), 0], [L1*np.cos(theta1) + L2*np.cos(theta1+theta2) + L3*np.cos(theta1+theta2+theta3), L1*np.sin(theta1) + L2*np.sin(theta1+theta2) + L3*np.sin(theta1+theta2+theta3), 0]])
+    desired_data = np.array([[x_desired, y_desired, 0]])
+    ax.clear()
+    ax.set_xlim(-2, 2)
+    ax.set_ylim(-2, 2)
+    ax.set_zlim(0, 3)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    ax.plot(arm_data[:,0], arm_data[:,1], arm_data[:,2], 'bo-', linewidth=2, markersize=12)
+    ax.plot(desired_data[:,0], desired_data[:,1], desired_data[:,2], 'ro', markersize=12)
 
-ax.clear()
-ax.set_xlim(-2, 2)
-ax.set_ylim(-2, 2)
-ax.set_zlim(0, 3)
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
-
-ax.plot(arm_data[:,0], arm_data[:,1], arm_data[:,2], 'bo-', linewidth=2, markersize=12)
-ax.plot(desired_data[:,0], desired_data[:,1], desired_data[:,2], 'ro', markersize=12)
-
-plt.pause(0.01)
+    plt.pause(0.01)
 
 # Show the plot
 
