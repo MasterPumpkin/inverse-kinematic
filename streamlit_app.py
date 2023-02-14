@@ -76,4 +76,4 @@ for i in range(frames):
 
 # Show the plot
 
-plt.show()
+    plt.show()
