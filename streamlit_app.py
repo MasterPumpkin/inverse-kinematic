@@ -1,63 +1,50 @@
-import numpy as np
 import streamlit as st
+import numpy as np
 import matplotlib.pyplot as plt
 
-L1, L2, L3 = 1, 1, 1 # Length of each link of the robot
+# Define the length of the two links
+l1 = 1
+l2 = 1
 
-def forward_kinematic(theta1, theta2, theta3):
-    """
-    Calculates the forward kinematics of the 3DOF robotic arm
-    """
-    x = L1 * np.cos(theta1) + L2 * np.cos(theta1 + theta2) + L3 * np.cos(theta1 + theta2 + theta3)
-    y = L1 * np.sin(theta1) + L2 * np.sin(theta1 + theta2) + L3 * np.sin(theta1 + theta2 + theta3)
+def forward_kinematic(theta1, theta2):
+    x = l1 * np.cos(theta1) + l2 * np.cos(theta1 + theta2)
+    y = l1 * np.sin(theta1) + l2 * np.sin(theta1 + theta2)
     return x, y
 
 def inverse_kinematic(x, y):
-    """
-    Calculates the inverse kinematics of the 3DOF robotic arm
-    """
+    # Solve for theta1
     theta1 = np.arctan2(y, x)
-    x_ = np.sqrt(x**2 + y**2) - L3
-    c2 = (x_**2 + y**2 - L1**2 - L2**2) / (2 * L1 * L2)
-    s2 = np.sqrt(1 - c2**2)
-    theta2 = np.arctan2(s2, c2)
-    theta3 = np.arctan2(y, x_) - np.arctan2(L2 * s2, L1 + L2 * c2)
-    return theta1, theta2, theta3
 
-def plot_robot(theta1, theta2, theta3):
-    """
-    Plots the robot using the forward kinematics
-    """
-    x1 = 0
-    y1 = 0
-    x2 = L1 * np.cos(theta1)
-    y2 = L1 * np.sin(theta1)
-    x3 = x2 + L2 * np.cos(theta1 + theta2)
-    y3 = y2 + L2 * np.sin(theta1 + theta2)
-    x4 = x3 + L3 * np.cos(theta1 + theta2 + theta3)
-    y4 = y3 + L3 * np.sin(theta1 + theta2 + theta3)
-    
-    plt.plot([x1, x2, x3, x4], [y1, y2, y3, y4], 'o-', markersize=10)
-    plt.xlim(-2, 2)
-    plt.ylim(-2, 2)
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.show()
+    # Solve for theta2
+    D = np.sqrt(x**2 + y**2)
+    a = np.arccos((l1**2 + D**2 - l2**2) / (2 * l1 * D))
+    b = np.arccos((l2**2 + D**2 - l1**2) / (2 * l2 * D))
+    theta2 = np.pi - a - b
+    return theta1, theta2
 
-def main():
-    st.title("3DOF Robotic Arm Inverse Kinematics")
+st.title("2 DOF Robotic Arm Inverse Kinematic")
 
-    x = st.slider("End-effector x position", -2, 2, 1)
-    y = st.slider("End-effector y position", -2, 2, 1)
+x = st.slider("End-effector X position", 0.0, 2.0, 1.0)
+y = st.slider("End-effector Y position", 0.0, 2.0, 1.0)
 
-    theta1, theta2, theta3 = inverse_kinematic(x, y)
-    st.write("Joint angles (in radians):")
-    st.write("Theta 1: ", theta1)
-    st.write("Theta 2: ", theta2)
-    st.write("Theta 3: ", theta3)
+theta1, theta2 = inverse_kinematic(x, y)
 
-    if st.button("Visualize"):
-        plot_robot(theta1, theta2, theta3)
-        # st.balloons()
+st.write("Theta1:", theta1)
+st.write("Theta2:", theta2)
 
-if __name__ == "__main__": 
-	main()
+# Plot the forward kinematic
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+
+x1 = 0
+y1 = 0
+x2 = l1 * np.cos(theta1)
+y2 = l1 * np.sin(theta1)
+x3 = x2 + l2 * np.cos(theta1 + theta2)
+y3 = y2 + l2 * np.sin(theta1 + theta2)
+
+ax.plot([x1, x2, x3], [y1, y2, y3], marker="o")
+
+st.pyplot()
