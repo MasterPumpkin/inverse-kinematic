@@ -46,7 +46,7 @@ ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 
 # Define the plot data
-arm_data = np.array([[0, 0, 0], [L1*np.cos(theta1), L1*np.sin(theta1), 0, [L1_np.cos(theta1) + L2_np.cos(theta1+theta2), L1_np.sin(theta1) + L2_np.sin(theta1+theta2), 0], [L1_np.cos(theta1) + L2_np.cos(theta1+theta2) + L3_np.cos(theta1+theta2+theta3), L1_np.sin(theta1) + L2_np.sin(theta1+theta2) + L3_np.sin(theta1+theta2+theta3), 0]]) 
+arm_data = np.array([[0, 0, 0], [L1*np.cos(theta1), L1*np.sin(theta1), 0], [L1_np.cos(theta1) + L2_np.cos(theta1+theta2), L1_np.sin(theta1) + L2_np.sin(theta1+theta2), 0], [L1_np.cos(theta1) + L2_np.cos(theta1+theta2) + L3_np.cos(theta1+theta2+theta3), L1_np.sin(theta1) + L2_np.sin(theta1+theta2) + L3_np.sin(theta1+theta2+theta3), 0]]) 
 desired_data = np.array([[x_desired, y_desired, 0]])
 
 # Plot the arm and desired end effector position
