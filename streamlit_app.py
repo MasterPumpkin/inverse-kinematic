@@ -26,23 +26,23 @@ def main():
     ax = fig.add_subplot(111, projection="3d")
 
 	  # Define the arm segments
-	  arm_segments = np.array([[0, 0, 0], [L1*np.cos(angles[0]), L1*np.sin(angles[0]), 0], [L1*np.cos(angles[0]) + L2*np.cos(angles[1] + angles[0]), L1*np.sin(angles[0]) + L2*np.sin(angles[1] + angles[0]), L2*np.sin(angles[2])]])
+    arm_segments = np.array([[0, 0, 0], [L1*np.cos(angles[0]), L1*np.sin(angles[0]), 0], [L1*np.cos(angles[0]) + L2*np.cos(angles[1] + angles[0]), L1*np.sin(angles[0]) + L2*np.sin(angles[1] + angles[0]), L2*np.sin(angles[2])]])
 
   	# Plot the arm segments
-	  ax.plot(arm_segments[:, 0], arm_segments[:, 1], arm_segments[:, 2], color="blue")
+    ax.plot(arm_segments[:, 0], arm_segments[:, 1], arm_segments[:, 2], color="blue")
 
   	# Set the limits of the plot
-  	ax.set_xlim([-20, 20])
-  	ax.set_ylim([-20, 20])
-  	ax.set_zlim([0, 20])
+    ax.set_xlim([-20, 20])
+    ax.set_ylim([-20, 20])
+    ax.set_zlim([0, 20])
 
   	# Set the labels for the axes
-  	ax.set_xlabel("X")
-  	ax.set_ylabel("Y")
-  	ax.set_zlabel("Z")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
 
   	# Show the plot
-  	st.write(fig)
+    st.write(fig)
 
 if __name__ == "__main__": 
 	main()
