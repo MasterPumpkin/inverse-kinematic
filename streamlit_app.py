@@ -2,47 +2,44 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 
-def inverse_kinematics(x, y, z, L1, L2):
+# Define the length of each arm segment
+L1 = 1
+L2 = 0.5
+L3 = 0.25
+
+# Define the initial position of the end-effector
+p0 = np.array([0, 0])
+
+# Define the forward kinematics function
+def forward_kinematics(theta1, theta2, theta3):
+    p1 = np.array([L1 * np.cos(theta1), L1 * np.sin(theta1)])
+    p2 = p1 + np.array([L2 * np.cos(theta1 + theta2), L2 * np.sin(theta1 + theta2)])
+    p3 = p2 + np.array([L3 * np.cos(theta1 + theta2 + theta3), L3 * np.sin(theta1 + theta2 + theta3)])
+    return p3
+
+# Define the inverse kinematics function
+def inverse_kinematics(x, y):
+    r = np.sqrt(x ** 2 + y ** 2)
     theta1 = np.arctan2(y, x)
-    theta2 = np.arccos((L1**2 + L2**2 - x**2 - y**2)/(2*L1*L2))
-    theta3 = np.arctan2(np.sqrt(1 - ((L1**2 + L2**2 - x**2 - y**2)/(2*L1*L2))**2), ((L1 + L2*np.cos(theta2))*z - L2*np.sin(theta2)*np.sqrt(x**2 + y**2))/(L1**2 + 2*L1*L2*np.cos(theta2) + L2**2))
-    return [theta1, theta2, theta3]
-  
-def main():
-    st.title("3 DOF Robotic Arm Inverse Kinematics")
+    A = L2 + L3 * np.cos(np.pi - np.arccos((L1 ** 2 + r ** 2 - L2 ** 2 - L3 ** 2) / (2 * L1 * r)))
+    B = L3 * np.sin(np.pi - np.arccos((L1 ** 2 + r ** 2 - L2 ** 2 - L3 ** 2) / (2 * L1 * r)))
+    theta2 = np.arctan2(B, A)
+    theta3 = np.pi - np.arccos((A ** 2 + B ** 2 - L2 ** 2 - L3 ** 2) / (2 * L2 * L3))
+    return theta1, theta2, theta3
 
-    # Set the default values for the end-effector position and arm lengths
-    x = st.sidebar.slider("X", -10, 10, 5)
-    y = st.sidebar.slider("Y", -10, 10, 5)
-    z = st.sidebar.slider("Z", -10, 10, 5)
-    L1 = st.sidebar.slider("L1", 1, 10, 5)
-    L2 = st.sidebar.slider("L2", 1, 10, 5)
+# Define the Streamlit app
+st.title('3 DOF Robotic Arm Inverse Kinematics')
+x = st.slider('X-coordinate', -2.0, 2.0, 1.0, 0.1)
+y = st.slider('Y-coordinate', -2.0, 2.0, 1.0, 0.1)
 
-    # Calculate the joint angles using inverse kinematics
-    angles = inverse_kinematics(x, y, z, L1, L2)
+theta1, theta2, theta3 = inverse_kinematics(x, y)
+p = forward_kinematics(theta1, theta2, theta3)
 
-    # Plot the arm configuration
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
+# Define the Pyplot visualization
+fig, ax = plt.subplots()
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.plot([0, p[0]], [0, p[1]], 'r-', linewidth=2)
+ax.plot(p[0], p[1], 'ro', markers)
 
-	  # Define the arm segments
-    arm_segments = np.array([[0, 0, 0], [L1*np.cos(angles[0]), L1*np.sin(angles[0]), 0], [L1*np.cos(angles[0]) + L2*np.cos(angles[1] + angles[0]), L1*np.sin(angles[0]) + L2*np.sin(angles[1] + angles[0]), L2*np.sin(angles[2])]])
-
-  	# Plot the arm segments
-    ax.plot(arm_segments[:, 0], arm_segments[:, 1], arm_segments[:, 2], color="blue")
-
-  	# Set the limits of the plot
-    ax.set_xlim([-20, 20])
-    ax.set_ylim([-20, 20])
-    ax.set_zlim([0, 20])
-
-  	# Set the labels for the axes
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Z")
-
-  	# Show the plot
-    st.write(fig)
-
-if __name__ == "__main__": 
-	main()
+st.pyplot(fig)
