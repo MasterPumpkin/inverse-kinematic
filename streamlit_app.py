@@ -1,45 +1,56 @@
-import numpy as np
 import streamlit as st
+import numpy as np
 import matplotlib.pyplot as plt
 
-# Define the length of each arm segment
-L1 = 1
-L2 = 0.5
-L3 = 0.25
-
-# Define the initial position of the end-effector
-p0 = np.array([0, 0])
-
-# Define the forward kinematics function
 def forward_kinematics(theta1, theta2, theta3):
-    p1 = np.array([L1 * np.cos(theta1), L1 * np.sin(theta1)])
-    p2 = p1 + np.array([L2 * np.cos(theta1 + theta2), L2 * np.sin(theta1 + theta2)])
-    p3 = p2 + np.array([L3 * np.cos(theta1 + theta2 + theta3), L3 * np.sin(theta1 + theta2 + theta3)])
-    return p3
+    l1 = 1
+    l2 = 1
+    l3 = 1
+    
+    x = l1*np.cos(theta1) + l2*np.cos(theta1+theta2) + l3*np.cos(theta1+theta2+theta3)
+    y = l1*np.sin(theta1) + l2*np.sin(theta1+theta2) + l3*np.sin(theta1+theta2+theta3)
+    
+    return x, y
 
-# Define the inverse kinematics function
 def inverse_kinematics(x, y):
-    r = np.sqrt(x ** 2 + y ** 2)
-    theta1 = np.arctan2(y, x)
-    A = L2 + L3 * np.cos(np.pi - np.arccos((L1 ** 2 + r ** 2 - L2 ** 2 - L3 ** 2) / (2 * L1 * r)))
-    B = L3 * np.sin(np.pi - np.arccos((L1 ** 2 + r ** 2 - L2 ** 2 - L3 ** 2) / (2 * L1 * r)))
-    theta2 = np.arctan2(B, A)
-    theta3 = np.pi - np.arccos((A ** 2 + B ** 2 - L2 ** 2 - L3 ** 2) / (2 * L2 * L3))
+    l1 = 1
+    l2 = 1
+    l3 = 1
+    
+    D = (x**2 + y**2 - l1**2 - l2**2 - l3**2)/(2*l2*l3)
+    theta3 = np.arctan2(np.sqrt(1-D**2), D)
+    theta2 = np.arctan2(y, x) - np.arctan2(l3*np.sin(theta3), l1+l2*np.cos(theta3))
+    theta1 = np.arctan2(y-l2*np.sin(theta2)-l3*np.sin(theta2+theta3), x-l2*np.cos(theta2)-l3*np.cos(theta2+theta3))
+    
     return theta1, theta2, theta3
 
-# Define the Streamlit app
-st.title('3 DOF Robotic Arm Inverse Kinematics')
-x = st.slider('X-coordinate', -2.0, 2.0, 1.0, 0.1)
-y = st.slider('Y-coordinate', -2.0, 2.0, 1.0, 0.1)
+def main():
+    st.title('3 DOF Robotic Arm Inverse Kinematics')
 
-theta1, theta2, theta3 = inverse_kinematics(x, y)
-p = forward_kinematics(theta1, theta2, theta3)
+    theta1 = st.slider('Theta 1', 0.0, 360.0, 0.0)
+    theta2 = st.slider('Theta 2', 0.0, 360.0, 0.0)
+    theta3 = st.slider('Theta 3', 0.0, 360.0, 0.0)
 
-# Define the Pyplot visualization
-fig, ax = plt.subplots()
-ax.set_xlim(-2, 2)
-ax.set_ylim(-2, 2)
-ax.plot([0, p[0]], [0, p[1]], 'r-', linewidth=2)
-ax.plot(p[0], p[1], 'ro', markers)
+    x, y = forward_kinematics(theta1, theta2, theta3)
 
-st.pyplot(fig)
+    st.write('End effector position: ({}, {})'.format(x, y))
+
+    x_target = st.slider('Target X', -3.0, 3.0, 0.0)
+    y_target = st.slider('Target Y', -3.0, 3.0, 0.0)
+
+    theta1, theta2, theta3 = inverse_kinematics(x_target, y_target)
+
+    st.write('Joint angles: Theta 1: {}, Theta 2: {}, Theta 3: {}'.format(theta1, theta2, theta3))
+
+    # Visualisation
+    plt.figure()
+    plt.plot([0, l1*np.cos(theta1), l1*np.cos(theta1) + l2*np.cos(theta1+theta2), x_target], 
+             [0, l1*np.sin(theta1), l1*np.sin(theta1) + l2*np.sin(theta1+theta2), y_target], '-o')
+    plt.xlim([-3, 3])
+    plt.ylim([-3, 3])
+    plt.title('3 DOF Robotic Arm')
+    st.pyplot()
+    
+
+if __name__ == '__main__':
+    main()
