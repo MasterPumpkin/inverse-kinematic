@@ -2,6 +2,10 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+l1 = 1
+l2 = 1
+l3 = 1
+
 def forward_kinematics(theta1, theta2, theta3):
     l1 = 1
     l2 = 1
