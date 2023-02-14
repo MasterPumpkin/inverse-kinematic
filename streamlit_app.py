@@ -44,8 +44,7 @@ def main():
 
     # Visualisation
     plt.figure()
-    plt.plot([0, l1*np.cos(theta1), l1*np.cos(theta1) + l2*np.cos(theta1+theta2), x_target], 
-             [0, l1*np.sin(theta1), l1*np.sin(theta1) + l2*np.sin(theta1+theta2), y_target], '-o')
+    plt.plot([0, l1*np.cos(theta1), l1*np.cos(theta1) + l2*np.cos(theta1+theta2), x_target], [0, l1*np.sin(theta1), l1*np.sin(theta1) + l2*np.sin(theta1+theta2), y_target], '-o')
     plt.xlim([-3, 3])
     plt.ylim([-3, 3])
     plt.title('3 DOF Robotic Arm')
